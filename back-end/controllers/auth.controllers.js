@@ -1,8 +1,7 @@
 export const login = (req, res) => {
     try{
-        const [fname, uname, password, confPassword] = req.body()
     } catch(err) {
-        
+
     }
 }
 
