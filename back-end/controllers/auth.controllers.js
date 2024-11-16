@@ -1,8 +1,17 @@
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
 import generateTokenAndSetCookie from "../utils/generateToken.js";
+import { validationResult } from "express-validator";
 export const login = async (req, res) => {
     try{
+
+        const errors = validationResult(req);
+    
+        // Check for validation errors
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array()});
+        }
+
         const {username, password} = req.body;
 
         const user = await User.findOne({username});
@@ -10,7 +19,7 @@ export const login = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
         
         if(!isPasswordCorrect || !user) {
-            return res.status(400).json({error: "Invalid username or password"})
+            return res.status(400).json({errors: [{msg: "Invalid username or password"}]})
         }
 
         const userInfo = {
@@ -26,7 +35,7 @@ export const login = async (req, res) => {
 
     } catch(err) {
         console.log('Error in login controller: ', err.message)
-        res.status(500).json({error: "Server error"})
+        res.status(500).json({error: [{msg: "Server error"}]})
     }
 }
 
